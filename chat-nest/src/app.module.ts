@@ -1,13 +1,24 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { WsGateway } from './ws-gateway/ws-gateway.gateway';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import {Module} from '@nestjs/common';
+import {WsGateway} from './ws-gateway/ws-gateway.gateway';
+import {AuthModule} from './auth/auth.module';
+import {UsersModule} from './users/users.module';
+import {TypeOrmModule} from '@nestjs/typeorm';
 
 @Module({
-  imports: [AuthModule, UsersModule],
-  controllers: [AppController],
-  providers: [AppService, WsGateway],
+    imports: [
+        TypeOrmModule.forRoot({
+            type: 'mysql',
+            port: 3306,
+            username: 'root',
+            password: 'qinzhuan',
+            database: 'qzchat',
+            charset: "utf8mb4", // 设置chatset编码为utf8mb4
+            autoLoadEntities: true,
+            synchronize: true
+        }),
+        AuthModule,
+        UsersModule],
+    providers: [WsGateway],
 })
-export class AppModule {}
+export class AppModule {
+}

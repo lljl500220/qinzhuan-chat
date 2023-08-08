@@ -5,13 +5,13 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   userId: string;
 
-  @Column({ default: '陈冠希' })
+  @Column({ default: 'qinzhuan' })
   username: string;
 
   @Column({ default: '123456', select: false })
   password: string;
 
-  @Column({ default: 'chenguanxi.png' })
+  @Column({ default: 'qinzhuan.png' })
   avatar: string;
 
   @Column({ default: 'user' })

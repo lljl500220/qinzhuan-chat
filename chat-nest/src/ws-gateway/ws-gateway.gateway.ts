@@ -8,7 +8,6 @@ export class WsGateway implements OnGatewayInit {
 
     @SubscribeMessage('message')
     handleEvent(@MessageBody() data: string): string {
-        console.log(data)
         return data;
     }
 }

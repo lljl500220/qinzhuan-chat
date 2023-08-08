@@ -1,18 +1,68 @@
-import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { JwtService } from '@nestjs/jwt';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {JwtService} from '@nestjs/jwt';
+import {User} from "../users/entity/user.entity";
+import {Repository} from "typeorm";
+import {RCode} from "../common/constant/rcode";
+import {InjectRepository} from "@nestjs/typeorm";
+import {nameVerify, passwordVerify} from "../common/tool/utils";
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly usersService: UsersService,  private readonly jwtService: JwtService) {}
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+        private readonly jwtService: JwtService
+    ) {
+    }
 
-    async validateUser(username: string, pass: string): Promise<any> {
-        const user = await this.usersService.findOne(username);
-        if (user && user.password === pass) {
-            const { password, ...result } = user;
-            result.token = this.jwtService.sign(user)
-            return result;
+
+    async login(data: User): Promise<any> {
+        try {
+            const user = await this.userRepository.findOne({where: {username: data.username, password: data.password}});
+            if (!user) {
+                return {code: 1, msg: '密码错误', data: ''};
+            }
+            if (!passwordVerify(data.password) || !nameVerify(data.username)) {
+                return {code: RCode.FAIL, msg: '登录校验不通过！', data: ''};
+            }
+
+            const payload = {userId: user.userId, password: user.password};
+            return {
+                msg: '登录成功',
+                data: {
+                    user: user,
+                    token: this.jwtService.sign(payload)
+                },
+            };
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: '服务器异常',
+            }, HttpStatus.INTERNAL_SERVER_ERROR)
         }
-        return null;
+
+    }
+
+    async register(data: User): Promise<any> {
+        try {
+            let user = await this.userRepository.findOne({where: {username: data.username, password: data.password}});
+            if (user) {
+                return {code: RCode.FAIL, msg: '重复用户', data: ''};
+            }
+            if (!passwordVerify(data.password) || !nameVerify(data.username)) {
+                return {code: RCode.FAIL, msg: '注册校验不通过！', data: ''};
+            }
+            const newUser = await this.userRepository.save({username: data.username, password: data.password})
+            const payload = {userId: newUser.userId, password: newUser.password};
+            return {
+                user: newUser,
+                token: this.jwtService.sign(payload)
+            };
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: '服务器异常',
+            }, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 }
