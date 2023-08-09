@@ -16,19 +16,20 @@ export class AuthService {
     }
 
 
-    async login(data: User): Promise<any> {
+    async login(data: CreateUserDto): Promise<any> {
         try {
             const user = await this.userRepository.findOne({where: {username: data.username, password: data.password}});
             if (!user) {
-                return {code: 1, msg: '密码错误', data: ''};
+                return {code: RCode.FAIL, message: '密码错误', data: ''};
             }
             if (!passwordVerify(data.password) || !nameVerify(data.username)) {
-                return {code: RCode.FAIL, msg: '登录校验不通过！', data: ''};
+                return {code: RCode.FAIL, message: '登录校验不通过！', data: ''};
             }
 
             const payload = {userId: user.userId, password: user.password};
             return {
-                msg: '登录成功',
+                code:RCode.OK,
+                message: '登录成功',
                 data: {
                     user: user,
                     token: this.jwtService.sign(payload)
@@ -43,18 +44,19 @@ export class AuthService {
 
     }
 
-    async register(data: User): Promise<any> {
+    async register(data: CreateUserDto): Promise<any> {
         try {
             let user = await this.userRepository.findOne({where: {username: data.username, password: data.password}});
             if (user) {
-                return {code: RCode.FAIL, msg: '重复用户', data: ''};
+                return {code: RCode.FAIL, message: '重复用户', data: ''};
             }
             if (!passwordVerify(data.password) || !nameVerify(data.username)) {
-                return {code: RCode.FAIL, msg: '注册校验不通过！', data: ''};
+                return {code: RCode.FAIL, message: '注册校验不通过！', data: ''};
             }
             const newUser = await this.userRepository.save({username: data.username, password: data.password})
             const payload = {userId: newUser.userId, password: newUser.password};
             return {
+                code:RCode.OK,
                 user: newUser,
                 token: this.jwtService.sign(payload)
             };

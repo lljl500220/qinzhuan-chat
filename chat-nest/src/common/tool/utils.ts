@@ -7,13 +7,7 @@ export function nameVerify(name: string): boolean {
   if (name.length === 0) {
     return false;
   }
-  if (!nameReg.test(name)) {
-    return false;
-  }
-  if (name.length > 9) {
-    return false;
-  }
-  return true;
+  return nameReg.test(name);
 }
 
 /**
@@ -25,11 +19,6 @@ export function passwordVerify(password: string): boolean {
   if (password.length === 0) {
     return false;
   }
-  if (!passwordReg.test(password)) {
-    return false;
-  }
-  if (password.length > 9) {
-    return false;
-  }
-  return true;
+  return passwordReg.test(password);
+
 }
