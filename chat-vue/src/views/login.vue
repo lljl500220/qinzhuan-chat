@@ -3,9 +3,11 @@ import {login, register} from "../api/auth";
 import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {ElMessage} from "element-plus";
-import {setToken} from "../utils/cookies.ts";
+import {setToken} from "../utils/cookies";
+import {useUserInfoStore} from "../store/modules/userInfo";
 import Res = HttpType.Res;
 
+const userInfoStore = useUserInfoStore()
 const router = useRouter() //路由对象
 const user = ref({ //form实体
   username: '',
@@ -19,12 +21,14 @@ const tip = ref('')
  */
 const doLogin = () => {
   login(user.value).then((res: Res) => {
+    console.log(res)
     if (res.code === 0) {
       ElMessage({
         type: "success",
         message: "登录成功"
       })
-      setToken(res.data.token)
+      setToken('token', res.data.token as string)
+      userInfoStore.setUser(res.data.user)
       router.push({name: 'index'})
     } else {
       tip.value = res.message as string
@@ -37,16 +41,16 @@ const doLogin = () => {
  * 功能：注册
  */
 const doRegister = () => {
-  console.log(user.value)
   register(user.value).then((res: Res) => {
     if (res.code === 0) {
       ElMessage({
         type: "success",
         message: "注册成功，将导航至首页"
       })
-      setToken(res.data.token)
+      setToken('token', res.data.token as string)
+      userInfoStore.setUser(res.data.user)
       router.push({name: 'index'})
-    }else {
+    } else {
       tip.value = res.message as string
     }
   })
@@ -131,10 +135,10 @@ section {
   &:before {
     content: "";
     position: absolute;
-    top: -50%;
+    top: -100%;
     left: -50%;
-    width: 200%;
-    height: 400%;
+    width: 4096px;
+    height: 4096px;
     background-image: linear-gradient(200deg, #fff886, #f072e6);
     animation: masked-animation 10s linear infinite;
   }

@@ -1,5 +1,5 @@
 export function logger(req, res, next) {
   const { method, path } = req;
-  console.log(`${method} ${path}`);
+  console.log(`访问${method} ${path}`);
   next();
 }

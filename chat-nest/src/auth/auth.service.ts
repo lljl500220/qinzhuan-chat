@@ -1,17 +1,20 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Inject, Injectable} from '@nestjs/common';
 import {JwtService} from '@nestjs/jwt';
 import {User} from "../users/entity/user.entity";
 import {Repository} from "typeorm";
 import {RCode} from "../common/constant/rcode";
 import {InjectRepository} from "@nestjs/typeorm";
 import {nameVerify, passwordVerify} from "../common/tool/utils";
+import Redis from "ioredis";
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        @Inject('REDIS_CLIENT')
+        private readonly redisClient:Redis
     ) {
     }
 
@@ -27,12 +30,14 @@ export class AuthService {
             }
 
             const payload = {userId: user.userId, password: user.password};
+            const token = this.jwtService.sign(payload)
+            this.redisClient.set(user.userId+'_jwt',token,"EX",86400)
             return {
                 code:RCode.OK,
                 message: '登录成功',
                 data: {
                     user: user,
-                    token: this.jwtService.sign(payload)
+                    token
                 },
             };
         } catch (error) {
@@ -55,10 +60,12 @@ export class AuthService {
             }
             const newUser = await this.userRepository.save({username: data.username, password: data.password})
             const payload = {userId: newUser.userId, password: newUser.password};
+            const token = this.jwtService.sign(payload)
+            this.redisClient.set(newUser.userId+'_jwt',token,"EX",86400)
             return {
                 code:RCode.OK,
                 user: newUser,
-                token: this.jwtService.sign(payload)
+                token
             };
         } catch (error) {
             throw new HttpException({

@@ -1,8 +1,10 @@
-import {Module} from '@nestjs/common';
+import {Global, Module} from '@nestjs/common';
 import {WsGateway} from './ws-gateway/ws-gateway.gateway';
 import {AuthModule} from './auth/auth.module';
 import {UsersModule} from './users/users.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import {FriendModule} from './friend/friend.module';
+import { RedisClientModule } from './redis_client/redis_client.module';
 
 @Module({
     imports: [
@@ -17,7 +19,9 @@ import {TypeOrmModule} from '@nestjs/typeorm';
             synchronize: true
         }),
         AuthModule,
-        UsersModule],
+        UsersModule,
+        FriendModule,
+        RedisClientModule],
     providers: [WsGateway],
 })
 export class AppModule {
