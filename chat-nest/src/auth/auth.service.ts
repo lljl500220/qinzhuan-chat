@@ -29,8 +29,9 @@ export class AuthService {
                 return {code: RCode.FAIL, message: '登录校验不通过！', data: ''};
             }
 
-            const payload = {userId: user.userId, password: user.password};
+            const payload = {userId: user.userId};
             const token = this.jwtService.sign(payload)
+            console.log(payload,token)
             this.redisClient.set(user.userId+'_jwt',token,"EX",86400)
             return {
                 code:RCode.OK,
@@ -72,6 +73,17 @@ export class AuthService {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 error: '服务器异常',
             }, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    async getUserInfo(req:any):Promise<any>{
+        const token = await this.redisClient.get(req.userId + "_jwt")
+        return {
+            code: RCode.OK,
+            data: {
+                user: req,
+                token
+            }
         }
     }
 }

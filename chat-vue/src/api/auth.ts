@@ -11,3 +11,7 @@ export const login = (user:User):Promise<any> =>{
 export const register = (user:User):Promise<any> =>{
     return post('/auth/register',user)
 }
+
+export const getUserInfo = ():Promise<any> =>{
+    return post('/auth/getUserInfo',{})
+}

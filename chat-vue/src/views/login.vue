@@ -21,7 +21,6 @@ const tip = ref('')
  */
 const doLogin = () => {
   login(user.value).then((res: Res) => {
-    console.log(res)
     if (res.code === 0) {
       ElMessage({
         type: "success",
