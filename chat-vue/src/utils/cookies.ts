@@ -2,7 +2,6 @@ import { useCookies } from 'vue3-cookies'
 
 const { cookies } = useCookies()
 export const getToken = () => {
-  console.log(cookies.get('token'))
   return cookies.get('token')
 }
 

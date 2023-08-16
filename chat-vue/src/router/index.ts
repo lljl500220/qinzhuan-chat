@@ -27,13 +27,19 @@ const router: Router = createRouter({
     history: createWebHistory()
 })
 
-router.beforeEach((_to, _from, next) => {
-    getUserInfo().then((res: any) => {
-        userInfoStore.setUser(res.data.user)
-        setToken('token', res.data.token as string)
+const whiteList = ['login']
+
+router.beforeEach((to, _from, next) => {
+    if (whiteList.includes(to.name as string)) {
         next()
-    }).catch(()=>{
-        next()
-    })
+    } else {
+        getUserInfo().then((res: any) => {
+            userInfoStore.setUser(res.data.user)
+            setToken('token', res.data.token as string)
+            next()
+        }).catch(() => {
+            next()
+        })
+    }
 })
 export default router

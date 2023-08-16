@@ -7,100 +7,51 @@ import Res = HttpType.Res;
 
 const user = useUserInfoStore().user
 
+//连接socket.io服务
 const socket = io("http://localhost:3000/events", {
   query: {
     userId: user.userId
   }
 }); // 根据你的服务器地址和端口进行修改
-
 socket.on("connect", () => {
   console.log("Connected to server");
 });
-
 socket.on('disconnectMessage', data => console.warn(data));
 socket.on('addFriend', (data: string) => {
   console.log(data)
 })
-const sendMsg = () => {
-}
+/**
+ * 作者：luolj
+ * 时间：2023/08/16 14:32:22
+ * 功能：添加好友
+ */
 const addFriend = () => {
   addFriendApi({userId: user.userId, friendId: '6518703c-f08e-4133-8197-6ec9b06e4cec'})
 }
 
-interface ListItem {
-  value: string
-  label: string
-}
-
-const list = ref<ListItem[]>([])
-const options = ref<ListItem[]>([])
-const value = ref<string[]>([])
-const loading = ref(false)
-
-onMounted(() => {
-  list.value = states.map((item) => {
-    return {value: `value:${item}`, label: `label:${item}`}
-  })
-})
-
+const userList = ref<any[]>([])  //搜索到的user
+const groupList = ref<any[]>([]) //搜索到的group
+const value = ref<string[]>([])  //搜索框绑定值
+const loading = ref(false) //搜索框的状态
+/**
+ * 作者：luolj
+ * 时间：2023/08/16 14:30:27
+ * 功能：搜索方法
+ */
 const remoteMethod = (query: string) => {
   findUserAndGroup({data:query}).then((res:Res)=>{
-    console.log(res)
+    userList.value = res.data.users
+    // groupList.value = res.data.groups
   })
 }
-
-const states = [
-  'Alabama',
-  'Alaska',
-  'Arizona',
-  'Arkansas',
-  'California',
-  'Colorado',
-  'Connecticut',
-  'Delaware',
-  'Florida',
-  'Georgia',
-  'Hawaii',
-  'Idaho',
-  'Illinois',
-  'Indiana',
-  'Iowa',
-  'Kansas',
-  'Kentucky',
-  'Louisiana',
-  'Maine',
-  'Maryland',
-  'Massachusetts',
-  'Michigan',
-  'Minnesota',
-  'Mississippi',
-  'Missouri',
-  'Montana',
-  'Nebraska',
-  'Nevada',
-  'New Hampshire',
-  'New Jersey',
-  'New Mexico',
-  'New York',
-  'North Carolina',
-  'North Dakota',
-  'Ohio',
-  'Oklahoma',
-  'Oregon',
-  'Pennsylvania',
-  'Rhode Island',
-  'South Carolina',
-  'South Dakota',
-  'Tennessee',
-  'Texas',
-  'Utah',
-  'Vermont',
-  'Virginia',
-  'Washington',
-  'West Virginia',
-  'Wisconsin',
-  'Wyoming',
-]
+/**
+ * 作者：luolj
+ * 时间：2023/08/16 14:31:18
+ * 功能：选择搜索到的目标
+ */
+const changeMethod = (id:string) => {
+  console.log(id)
+}
 
 </script>
 
@@ -113,11 +64,11 @@ const states = [
           找好友/群聊
           <el-select
               v-model="value"
-              multiple
               filterable
               remote
               placeholder="id/名称"
               reserve-keyword
+              @change="changeMethod"
               :remote-method="remoteMethod"
               :loading="loading"
           >
@@ -126,10 +77,10 @@ const states = [
                 label="用户"
             >
               <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                  v-for="item in userList"
+                  :key="item.userId"
+                  :label="item.username"
+                  :value="item.userId"
               />
             </el-option-group>
             <el-option-group
@@ -137,10 +88,10 @@ const states = [
                 label="群聊"
             >
               <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                  v-for="item in groupList"
+                  :key="item.groupId"
+                  :label="item.groupName"
+                  :value="item.groupId"
               />
             </el-option-group>
           </el-select>
@@ -150,9 +101,7 @@ const states = [
         </div>
       </div>
       <div class="left">
-        <el-scrollbar>
-          <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p>
-        </el-scrollbar>
+
       </div>
       <div class="msg-content">主体</div>
     </div>
@@ -217,6 +166,7 @@ const states = [
 
         :deep(.el-input__inner) {
           --el-input-height: 28px;
+          color: #ffffff !important;
         }
 
         :deep(.el-input__wrapper) {

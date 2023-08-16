@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
-import {Like, Repository} from "typeorm";
+import {Repository} from "typeorm";
 import {User} from "./entity/user.entity";
 import {RCode} from "../common/constant/rcode";
 
@@ -14,18 +14,18 @@ export class UsersService {
     }
 
     async findUseIdOrName(data: string) {
-        console.log(data)
         try {
-            const users = await this.userRepository.find({
-                select: ['username', "userId"],
-                where: {username: Like(data), userId: Like(data)}
-            })
+            const users = await this.userRepository.createQueryBuilder('user').select(['user.username', 'user.userId']).where(
+                'user.username LIKE :searchTerm', {searchTerm: `%${data}%`}
+            ).getMany()
             return {
-                code:RCode.OK,
-                data:users,
-            }   
-        }catch (e) {
-            
+                code: RCode.OK,
+                data: {
+                    users
+                },
+            }
+        } catch (e) {
+
         }
     }
 }

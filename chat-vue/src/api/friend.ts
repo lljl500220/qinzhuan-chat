@@ -7,3 +7,9 @@ export const findUserAndGroup = (data:any) => {
     return get('/users/findUserAndGroup',data)
 }
 
+export const findAllFriend = () => {
+    return get('/friend',{})
+}
+
+
+

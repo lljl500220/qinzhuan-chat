@@ -2,6 +2,7 @@ import axios, {type AxiosInstance, type AxiosRequestConfig} from 'axios'
 import {get} from 'lodash-es'
 import {ElMessage} from 'element-plus'
 import {getToken} from './cookies'
+import router from "../router";
 
 /** 创建请求实例 */
 function createService() {
@@ -42,6 +43,7 @@ function createService() {
                     break
                 case 401:
                     error.message = '身份验证失效，请重新登录'
+                    router.push({path:'/login'})
                     break
                 case 403:
                     error.message = '拒绝访问'

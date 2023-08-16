@@ -10,8 +10,9 @@ import {
 import {Server, Socket} from 'socket.io';
 import Redis from "ioredis";
 import {RCode} from "../common/constant/rcode";
-import {Inject, Logger} from "@nestjs/common";
+import {Inject, Injectable, Logger} from "@nestjs/common";
 
+@Injectable()
 @WebSocketGateway({namespace: 'events', cors: true})
 export class WsGateway implements OnGatewayInit, OnGatewayDisconnect ,OnGatewayConnection{
     @WebSocketServer()
@@ -50,7 +51,7 @@ export class WsGateway implements OnGatewayInit, OnGatewayDisconnect ,OnGatewayC
     }
 
     //加入一个群聊
-    @SubscribeMessage('joinFriendSocket')
+    @SubscribeMessage('joinGroupSocket')
     joinGroup(@MessageBody() data: string, @ConnectedSocket() client: Socket): string {
         return data;
     }
