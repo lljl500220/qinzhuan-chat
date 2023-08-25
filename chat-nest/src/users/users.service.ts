@@ -13,11 +13,12 @@ export class UsersService {
     ) {
     }
 
-    async findUseIdOrName(data: string) {
+    async findUseIdOrName(data: string,userId:string) {
         try {
+            //查找用户列表-除去自己
             const users = await this.userRepository.createQueryBuilder('user').select(['user.username', 'user.userId']).where(
                 'user.username LIKE :searchTerm', {searchTerm: `%${data}%`}
-            ).getMany()
+            ).andWhere('user.userId != :excludeId',{excludeId:userId}).getMany()
             return {
                 code: RCode.OK,
                 data: {

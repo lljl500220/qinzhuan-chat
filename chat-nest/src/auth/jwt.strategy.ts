@@ -1,18 +1,14 @@
 import {PassportStrategy} from '@nestjs/passport';
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {Inject, Injectable, UnauthorizedException} from '@nestjs/common';
 import {ExtractJwt, Strategy} from 'passport-jwt';
-import {UsersService} from "../users/users.service";
 import {jwtConstants} from "./constants"
-import {InjectRepository} from "@nestjs/typeorm";
-import {User} from "../users/entity/user.entity";
-import {Repository} from "typeorm";
+import Redis from "ioredis";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
-        private readonly usersService: UsersService) {
+        @Inject('REDIS_CLIENT')
+        private readonly redisClient:Redis) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
@@ -22,12 +18,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     async validate(payload: any) {
         const { userId } = payload;
-        const user = await this.userRepository.findOne({where: {userId}});  // 你需要实现这个方法
-
-        if (!user) {
+        const token = await  this.redisClient.get(userId+'_jwt')
+        if (!token) {
             throw new UnauthorizedException();
         }
 
-        return user;
+        return {userId:userId};
     }
 }

@@ -1,4 +1,4 @@
-import {Controller, Get, Param, Query, UseGuards} from '@nestjs/common';
+import {Controller, Get, Request, Query, UseGuards} from '@nestjs/common';
 import {AuthGuard} from "@nestjs/passport";
 import {UsersService} from "./users.service";
 
@@ -10,7 +10,7 @@ export class UsersController {
     ) {}
 
     @Get('/findUserAndGroup')
-    findUseIdOrName(@Query('data') data:string){
-        return this.usersService.findUseIdOrName(data)
+    findUseIdOrName(@Query('data') data:string,@Request() req:any){
+        return this.usersService.findUseIdOrName(data,req.user?.userId)
     }
 }

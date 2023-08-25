@@ -14,7 +14,7 @@ export class AuthService {
         private readonly userRepository: Repository<User>,
         private readonly jwtService: JwtService,
         @Inject('REDIS_CLIENT')
-        private readonly redisClient:Redis
+        private readonly redisClient: Redis
     ) {
     }
 
@@ -31,10 +31,9 @@ export class AuthService {
 
             const payload = {userId: user.userId};
             const token = this.jwtService.sign(payload)
-            console.log(payload,token)
-            this.redisClient.set(user.userId+'_jwt',token,"EX",86400)
+            this.redisClient.set(user.userId + '_jwt', token, "EX", 86400)
             return {
-                code:RCode.OK,
+                code: RCode.OK,
                 message: '登录成功',
                 data: {
                     user: user,
@@ -62,9 +61,9 @@ export class AuthService {
             const newUser = await this.userRepository.save({username: data.username, password: data.password})
             const payload = {userId: newUser.userId, password: newUser.password};
             const token = this.jwtService.sign(payload)
-            this.redisClient.set(newUser.userId+'_jwt',token,"EX",86400)
+            this.redisClient.set(newUser.userId + '_jwt', token, "EX", 86400)
             return {
-                code:RCode.OK,
+                code: RCode.OK,
                 user: newUser,
                 token
             };
@@ -76,12 +75,14 @@ export class AuthService {
         }
     }
 
-    async getUserInfo(req:any):Promise<any>{
-        const token = await this.redisClient.get(req.userId + "_jwt")
+    async getUserInfo(userId: string): Promise<any> {
+        const token = await this.redisClient.get(userId + "_jwt")
         return {
             code: RCode.OK,
             data: {
-                user: req,
+                user: await this.userRepository.findOne({
+                    where: {userId: userId}
+                }),
                 token
             }
         }

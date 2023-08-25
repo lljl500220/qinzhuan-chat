@@ -26,6 +26,7 @@ export class WsGateway implements OnGatewayInit, OnGatewayDisconnect ,OnGatewayC
     }
 
     async handleConnection(client:Socket,...arg:any[]): Promise<string|boolean> {
+        // console.log(client.conn.transport.name) 查看由polling发起的还是由websocket发起的
         this.logger.log(`userId为${client.handshake.query.userId}申请建立socket连接`)
         const jwt = await this.redisClient.get(client.handshake.query.userId + '_jwt')
         if (jwt) {
@@ -56,6 +57,7 @@ export class WsGateway implements OnGatewayInit, OnGatewayDisconnect ,OnGatewayC
         return data;
     }
 
+    //在网关之外发送给房间
     broadcastToRoom(room: string, emit: string, message: string) {
         this.server.to(room).emit(emit, message);
     }
@@ -67,3 +69,4 @@ export class WsGateway implements OnGatewayInit, OnGatewayDisconnect ,OnGatewayC
         this.server.to(id).emit(emit, message);
     }
 }
+

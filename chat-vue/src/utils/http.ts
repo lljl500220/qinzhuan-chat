@@ -1,10 +1,9 @@
 import { request } from './service'
-// @ts-ignore
 import { ElLoading } from 'element-plus'
 
 export const post = (
   url: string,
-  data?: any,
+  data = {},
   isLoading = true
 ): Promise<any> => {
   return new Promise((resolve, reject) => {

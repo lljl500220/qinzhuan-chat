@@ -43,7 +43,12 @@ function createService() {
                     break
                 case 401:
                     error.message = '身份验证失效，请重新登录'
-                    router.push({path:'/login'})
+                    router.push({path:'/login'}).then(()=>{
+                        ElMessage.error('导航至登录页失败，4s后将为你刷新页面')
+                        setTimeout(()=>{
+                            location.reload()
+                        },4000)
+                    })
                     break
                 case 403:
                     error.message = '拒绝访问'

@@ -2,13 +2,13 @@
 
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
-const local = zhCn
 </script>
 
 <template>
-  <el-config-provider :locale="local">
+  <el-config-provider :locale="zhCn">
   <router-view/>
   </el-config-provider>
+
 </template>
 
 <style scoped>

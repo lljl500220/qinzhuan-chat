@@ -1,7 +1,6 @@
 import {Body, Controller, Inject, Post, Request, UseGuards} from '@nestjs/common';
 import {AuthService} from "./auth.service";
 import {AuthGuard} from "@nestjs/passport";
-import {RCode} from "../common/constant/rcode";
 import Redis from "ioredis";
 
 @Controller('auth')
@@ -28,6 +27,6 @@ export class AuthController {
     @UseGuards(AuthGuard('jwt'))
     @Post('/getUserInfo')
     async getUserInfo(@Request() req: any) {
-       return this.authService.getUserInfo(req.user)
+       return this.authService.getUserInfo(req.user?.userId)
     }
 }
