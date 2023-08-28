@@ -4,14 +4,10 @@ import store from "../index";
 import {io} from "socket.io-client";
 import userInfoStoreHook from "./userInfo";
 
-interface ChatItem {
-    name: string
-    id: string
-}
-
 export const useChatStore = defineStore('chatStore', () => {
-    const chatList = ref<ChatItem[]>([])
-    const socket = ref<any>(null)
+    const chatList = ref<ChatItem[]>([]) //会话列表
+    const activeRoom = ref({id: 'luolj'})
+    const socket = ref<any>(null) //会话对象
     //初始化socket
     const initSocket = () => {
         const userInfo = userInfoStoreHook()
@@ -36,9 +32,29 @@ export const useChatStore = defineStore('chatStore', () => {
     }
     //初始化已经加入的群聊列表和好友列表
     const initChatList = () => {
-
+        chatList.value = [
+            {
+                friendId: 'luolj',
+                friendName: 'luolj',
+                messageList: []
+            }, {
+                groupId: 'qinzhuan',
+                groupName: '秦篆聊天室',
+                messageList: []
+            },
+        ]
+        setTimeout(() => {
+            chatList.value.push({
+                groupId: 'cat',
+                groupName: '瞎猫聊天室',
+                messageList: []
+            })
+            chatList.value[0].messageList.unshift({
+                content: "aaa", id: "", messageType: "string", time: "10:50", userId: ""
+            })
+        }, 5000)
     }
-    return {chatList, initChatList, initSocket}
+    return {chatList, activeRoom, initChatList, initSocket}
 })
 
 export default function chatStoreHook() {
