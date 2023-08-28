@@ -1,26 +1,75 @@
 <script setup lang="ts">
 import {Plus, Search} from "@element-plus/icons-vue";
-import {ref} from "vue";
+import { onMounted, ref, watch } from "vue";
 import QinChatList from "../components/QinChatList.vue";
+import { useUserInfoStore } from "../store/modules/userInfo";
+import { findUserApi,addFriendApi } from "../api/friend";
+import { ElMessage } from "element-plus";
+import { useChatStore } from "../store/modules/chat";
+import QinChatContent from "../components/QinChatContent.vue";
 
-const searchWord = ref('')
+const searchGroupWord = ref('')
+const searchFriendWord = ref('')
+
+const userInfoStore = useUserInfoStore()
+const chatStore = useChatStore()
+
+const showFindForm = ref(false)
+
+const friendList = ref<Friend[]>([])
+interface FindUserRes{
+  code:number
+  data:{
+    users:[]
+  },
+  message:string
+}
+watch(() => searchFriendWord.value, (n:string) => {
+  if (n !== ''){
+    findUserApi({data:n}).then((res:FindUserRes)=>{
+      friendList.value = res.data.users
+    })
+  }
+});
+const addFriend = (id:string,name:string) =>{
+  addFriendApi({userId:userInfoStore.user.userId,friendId:id}).then((res:FindUserRes)=>{
+    if (res.code === 0){
+      ElMessage.success('添加成功，去发起会话吧！')
+      chatStore.chatList.unshift({
+        id:[userInfoStore.user.userId,id].sort().join('-'),
+        friendId: id,
+        friendName: name,
+        messageList: []
+      })
+    }else {
+      ElMessage.warning(res.message)
+    }
+  })
+}
+onMounted(() => {
+  chatStore.initSocket()
+});
 </script>
 
 <template>
   <div class="chat">
-    <div class="chat-my"></div>
+    <div class="chat-my">
+      <div class="chat-my-name">
+        {{userInfoStore.user.username[0]}}
+      </div>
+    </div>
     <div class="chat-friend">
       <div class="chat-friend-search">
         <div class="chat-friend-search-input">
           <el-input
-              v-model="searchWord"
+              v-model="searchGroupWord"
               class="w-50 m-2"
               placeholder=""
               :prefix-icon="Search as any"
           />
         </div>
         <div class="chat-friend-search-add">
-          <el-icon>
+          <el-icon @click="showFindForm = true">
             <Plus/>
           </el-icon>
         </div>
@@ -29,8 +78,21 @@ const searchWord = ref('')
         <qin-chat-list/>
       </div>
     </div>
-    <div class="chat-room"></div>
+    <div class="chat-room">
+      <qin-chat-content></qin-chat-content>
+    </div>
   </div>
+  <el-dialog title="加好友" v-model="showFindForm" top="30vh" width="500px">
+    <el-input v-model="searchFriendWord" clearable placeholder="id或用户名"></el-input>
+    <div class="search-friend-list">
+      <ul>
+        <li v-for="friend in friendList">
+          <span>{{friend.username}}</span>
+          <el-button type="primary" size="small" round plain @click="addFriend(friend.userId,friend.username)">加好友</el-button>
+        </li>
+      </ul>
+    </div>
+  </el-dialog>
 </template>
 
 <style scoped lang="scss">
@@ -47,12 +109,20 @@ const searchWord = ref('')
     height: 100%;
     width: 60px;
     background: rgb(46, 46, 46);
+    text-align: center;
+    &-name{
+      color: #fff;
+      font-size: 44px;
+      text-shadow: #FFF 1px 0 10px,#FFF 1px 0 10px,#FFF 1px 0 10px;
+    }
   }
 
   &-friend {
     height: 100%;
     width: 300px;
     background: rgb(231,231,231);
+    box-sizing: border-box;
+    border-right: rgb(231,231,231) 1px solid;
 
     &-search {
       width: 100%;
@@ -106,7 +176,19 @@ const searchWord = ref('')
   &-room {
     height: 100%;
     width: 540px;
-    background: #c50617;
+  }
+}
+.search-friend-list{
+  width: 100%;
+  ul{
+    padding: 10px;
+  }
+  li{
+    width: 100%;
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
 }
 </style>

@@ -100,17 +100,6 @@ const changePanel = (val: number) => {
 </template>
 
 <style scoped lang="scss">
-* {
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  display: flex;
-  position: relative;
-  justify-content: center;
-  align-items: center;
-}
 
 @-webkit-keyframes masked-animation {
   0% {
@@ -123,6 +112,7 @@ html, body {
 
 section {
   height: 100vh;
+  width: 100vw;
   display: flex;
   position: relative;
   justify-content: center;

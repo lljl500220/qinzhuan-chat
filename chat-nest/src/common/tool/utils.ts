@@ -20,5 +20,4 @@ export function passwordVerify(password: string): boolean {
     return false;
   }
   return passwordReg.test(password);
-
 }

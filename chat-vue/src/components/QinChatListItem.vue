@@ -34,6 +34,7 @@ const isActive = computed(() => {
  */
 const changeActive = () => {
   chatStore.activeRoom.id = id
+  chatStore.getActiveInfo()
 }
 
 onMounted(() => {
