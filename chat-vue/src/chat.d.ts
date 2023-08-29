@@ -1,19 +1,33 @@
-interface Message {
+interface FriendMessage {
     id:string
+    room:string
     userId:string
-    friendId?:string
-    groupId?:string
+    userName:string
     content:string
     messageType:string
     time:string
 }
-interface ChatItem {
+
+interface GroupMessage {
     id:string
-    groupId?:string
-    friendId?:string
-    friendName?:string
-    groupName?:string
-    messageList:Message[]
+    userId:string
+    groupId:string
+    content:string
+    messageType:string
+    time:string
+}
+
+interface friendChatItem {
+    room:string
+    friendId:string
+    friendName:string
+    messageList:FriendMessage[]
+}
+interface groupChatItem {
+    room:string
+    groupId:string
+    groupName:string
+    messageList:GroupMessage[]
 }
 
 interface Friend{

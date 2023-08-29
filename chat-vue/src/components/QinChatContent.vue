@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { useChatStore } from "../store/modules/chat";
-import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import {useChatStore} from "../store/modules/chat";
+import {storeToRefs} from "pinia";
+import {ref} from "vue";
+import {useUserInfoStore} from "../store/modules/userInfo.ts";
 
 const chatStore = useChatStore();
+const userInfoStore = useUserInfoStore()
 
-const { activeRoomInfo } = storeToRefs(chatStore);
+const {activeRoomInfo} = storeToRefs(chatStore);
 
 const sendMsgStr = ref("");
 const sendMsg = () => {
-  chatStore.sendMsg(sendMsgStr.value)
+  chatStore.sendFriendMsg(sendMsgStr.value)
+}
+
+const emojis = ['😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🫠', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '🥲',
+  '🤗', '🫡', '🤐']
+const getEmoji = (emoji:string) => {
+  sendMsgStr.value += emoji
 }
 </script>
 
@@ -22,19 +30,40 @@ const sendMsg = () => {
     </div>
     <div class="chat-content-msg-list">
       <el-scrollbar>
-        <ul v-for="item in 20">
-          <li>
-            sadasda
+        <ul v-for="msg in activeRoomInfo.messageList">
+          <li class="msg-item" v-if="msg.userId !== userInfoStore.user.userId">
+            <div class="msg-avatar">
+              {{activeRoomInfo.friendName[0] || activeRoomInfo.groupName[0]}}
+            </div>
+            <div class="msg-content">
+              {{ msg.content }}
+            </div>
+          </li>
+          <li class="msg-item right" v-else>
+            <div class="msg-content">
+              {{ msg.content }}
+            </div>
+            <div class="msg-avatar">
+              {{activeRoomInfo.friendName[0] || activeRoomInfo.groupName[0]}}
+            </div>
           </li>
         </ul>
       </el-scrollbar>
     </div>
     <div class="chat-content-input">
+      <el-popover placement="top" :width="200" trigger="click">
+        <template #reference>
+          <span>😀😇</span>
+        </template>
+        <div style="display: flex;flex-wrap: wrap;gap: 4px ">
+          <div style="font-family: sans-serif" @click="getEmoji(item)" v-for="item in emojis">{{ item }}</div>
+        </div>
+      </el-popover>
       <el-input
-        v-model="sendMsgStr"
-        :rows="3"
-        type="textarea"
-        placeholder=""
+          v-model="sendMsgStr"
+          :rows="3"
+          type="textarea"
+          placeholder=""
       />
       <div class="send-btn" @click="sendMsg"></div>
     </div>
@@ -56,10 +85,46 @@ const sendMsg = () => {
 
   &-msg-list {
     width: 100%;
-    padding: 0 10px 10px 10px;
+    padding: 10px;
     box-sizing: border-box;
     height: calc(100% - 70px - 100px);
     overflow: hidden;
+    ul{
+      padding: 0;
+      margin: 0;;
+    }
+    .msg-item{
+      font-family: sans-serif;
+      list-style-type: none;
+      display: flex;
+      flex-direction: row;
+      gap:10px;
+      margin-bottom: 20px;
+      .msg-avatar{
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        background-color: antiquewhite;
+        border-radius: 50%;
+      }
+      .msg-content{
+        line-height: 36px;
+        padding: 2px 15px;
+        box-sizing: border-box;
+        background-color: antiquewhite;
+        border-radius: 10px;
+      }
+    }
+    .right{
+      justify-content: flex-end;
+      .msg-avatar{
+        background-color: rgb(51, 161, 236);
+      }
+      .msg-content{
+        background-color: rgb(51, 161, 236);
+      }
+    }
   }
 
   &-input {
@@ -67,6 +132,8 @@ const sendMsg = () => {
     height: 100px;
     width: 100%;
     box-shadow: 0 -7px 7px -7px #5E5E5E;
+    display: flex;
+    font-family: sans-serif;
 
     .send-btn {
       width: 24px;

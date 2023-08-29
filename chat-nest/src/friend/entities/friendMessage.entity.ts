@@ -9,7 +9,10 @@ export class FriendMessage {
   userId: string;
 
   @Column()
-  friendId: string;
+  room: string;
+
+  @Column()
+  username: string;
 
   @Column()
   content: string;
@@ -17,6 +20,6 @@ export class FriendMessage {
   @Column()
   messageType: string;
 
-  @Column('double')
-  time: number;
+  @Column()
+  time: string;
 }

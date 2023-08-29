@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed, onMounted, PropType, ref, watch} from "vue";
 import {useChatStore} from "../store/modules/chat";
+import {Logger} from "sass";
 
 const chatStore = useChatStore()
 //色彩集合
@@ -10,7 +11,7 @@ const avatar: any = ref()
 
 const props = defineProps({
   item: {
-    type: Object as PropType<ChatItem>,
+    type: Object as PropType<friendChatItem|groupChatItem>,
     required: true
   }
 })
@@ -21,10 +22,10 @@ const isGroup = props.item.groupName //是否是群组
 const color = colors[Math.floor(Math.random() * 10)] //随机色
 const isDot = ref(false) //是否有新消息
 watch(props.item?.messageList, () => {
-  isDot.value = true
+  isDot.value = id !== chatStore.activeRoom.room
 })
 const isActive = computed(() => {
-  return id === chatStore.activeRoom.id
+  return id === chatStore.activeRoom.room
 }) //是否选中
 
 /**
@@ -33,12 +34,13 @@ const isActive = computed(() => {
  * 功能：改变当前组件的选中状态
  */
 const changeActive = () => {
-  chatStore.activeRoom.id = id
+  chatStore.activeRoom.room = id
   chatStore.getActiveInfo()
 }
 
 onMounted(() => {
   avatar.value.style.background = color //头像颜色
+  console.log(props.item)
 })
 </script>
 
@@ -53,7 +55,7 @@ onMounted(() => {
         <el-tag size="small" :color="color">{{ isGroup ? '群组' : '个人' }}</el-tag>
         <span>{{ item.messageList[0]?.time }}</span>
       </div>
-      <div class="item-preview">
+      <div class="item-preview" style="font-family: sans-serif">
         {{ item.messageList[0]?.messageType === 'img' ? '[图片]' : item.messageList[0]?.content }}
       </div>
     </div>

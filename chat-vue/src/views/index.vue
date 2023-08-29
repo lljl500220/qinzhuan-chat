@@ -35,7 +35,7 @@ const addFriend = (id:string,name:string) =>{
   addFriendApi({userId:userInfoStore.user.userId,friendId:id}).then((res:FindUserRes)=>{
     if (res.code === 0){
       ElMessage.success('添加成功，去发起会话吧！')
-      chatStore.chatList.unshift({
+      chatStore.chatFriendList.unshift({
         id:[userInfoStore.user.userId,id].sort().join('-'),
         friendId: id,
         friendName: name,

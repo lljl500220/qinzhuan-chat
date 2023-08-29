@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import QinChatListItem from "./QinChatListItem.vue";
 import {useChatStore} from "../store/modules/chat";
+import store from "../store";
+import {storeToRefs} from "pinia";
 
 const chatStore = useChatStore()
 chatStore.initChatList()
-const list = chatStore.chatList
+const {chatFriendList,chatGroupList} = storeToRefs(chatStore)
 </script>
 
 <template>
   <el-scrollbar>
-    <qin-chat-list-item v-for="item in list" :item="item"/>
+    <qin-chat-list-item v-for="item in chatFriendList" :item="item"/>
+    <qin-chat-list-item v-for="item in chatGroupList" :item="item"/>
   </el-scrollbar>
 </template>
 
