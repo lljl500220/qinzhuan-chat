@@ -3,9 +3,12 @@ import { AppModule } from './app.module';
 import { logger } from './common/middleware/logger.middleware';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { HttpResponseInterceptor } from './common/interceptor/http-response';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useStaticAssets(join(__dirname, '..', 'public'));
   // app.use(cors) //允许跨域
   app.enableCors(); //允许跨域
   app.use(logger); //全局中间件

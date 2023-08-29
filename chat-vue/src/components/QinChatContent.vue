@@ -3,6 +3,8 @@ import {useChatStore} from "../store/modules/chat";
 import {storeToRefs} from "pinia";
 import {ref} from "vue";
 import {useUserInfoStore} from "../store/modules/userInfo.ts";
+import axios from "axios";
+import {getToken} from "../utils/cookies.ts";
 
 const chatStore = useChatStore();
 const userInfoStore = useUserInfoStore()
@@ -18,6 +20,19 @@ const emojis = ['😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🫠', 
   '🤗', '🫡', '🤐']
 const getEmoji = (emoji:string) => {
   sendMsgStr.value += emoji
+}
+
+const uploadImg = (event:InputEvent) => {
+  const file = event.target.files[0]
+  const formData = new FormData();
+  formData.append('file', file);
+  axios.post('http://localhost:3000/users/upload',formData,{
+    headers:{
+      Authorization: 'Bearer ' + getToken(),
+    }
+  }).then((res:any)=>{
+    console.log(res)
+  })
 }
 </script>
 
@@ -59,6 +74,7 @@ const getEmoji = (emoji:string) => {
           <div style="font-family: sans-serif" @click="getEmoji(item)" v-for="item in emojis">{{ item }}</div>
         </div>
       </el-popover>
+      <input type="file" @change="uploadImg"/>
       <el-input
           v-model="sendMsgStr"
           :rows="3"

@@ -113,7 +113,7 @@ export class WsGateway
             messageType: data.messageType,
             time: new Date().getHours().toString() + ':' + new Date().getMinutes()
         })
-        this.server.in(data.room).emit('sendFriendMsg', {
+        this.server.to(data.room).emit('sendFriendMsg', {
             room: data.room,
             userId: data.userId,
             userName: data.username,

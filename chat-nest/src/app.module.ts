@@ -6,8 +6,6 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {FriendModule} from './friend/friend.module';
 import {RedisClientModule} from './redis_client/redis_client.module';
 import {FriendMessage} from "./friend/entities/friendMessage.entity";
-import {FriendMap} from "./friend/entities/friend.entity";
-import {User} from "./users/entity/user.entity";
 
 @Module({
     imports: [
