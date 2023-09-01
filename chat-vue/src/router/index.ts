@@ -2,6 +2,7 @@ import {createRouter, createWebHistory, Router, RouteRecordRaw} from "vue-router
 import {getUserInfo} from "../api/auth";
 import userInfoStoreHook from "../store/modules/userInfo";
 import {setToken} from "../utils/cookies";
+import {delay} from "../utils/time";
 
 const userInfoStore = userInfoStoreHook()
 
@@ -20,6 +21,11 @@ const routes: RouteRecordRaw[] = [
         name: 'login',
         component: () => import("../views/login.vue")
     },
+    {
+        path: '/test',
+        name: 'test',
+        component: () => import("../views/test.vue")
+    },
 ]
 
 const router: Router = createRouter({
@@ -30,6 +36,7 @@ const router: Router = createRouter({
 const whiteList = ['login']
 
 router.beforeEach((to, _from, next) => {
+    delay(3000)
     if (whiteList.includes(to.name as string)) {
         next()
     } else {
@@ -41,5 +48,7 @@ router.beforeEach((to, _from, next) => {
             next()
         })
     }
+})
+router.afterEach(()=>{
 })
 export default router

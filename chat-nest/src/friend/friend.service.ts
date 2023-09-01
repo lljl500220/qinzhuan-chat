@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 import { FriendMessage } from './entities/friendMessage.entity';
 import { RCode } from '../common/constant/rcode';
 import Redis from 'ioredis';
-import { WsGateway } from '../ws-gateway/ws-gateway.gateway';
 import { User } from '../users/entity/user.entity';
 
 @Injectable()

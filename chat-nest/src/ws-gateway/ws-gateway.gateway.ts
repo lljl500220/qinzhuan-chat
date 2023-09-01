@@ -77,24 +77,6 @@ export class WsGateway
         this.logger.log(`id为 ${client.id} 的Socket.io 的服务已经关闭`);
     }
 
-    //创建一个私聊
-    @SubscribeMessage('joinFriendSocket')
-    joinFriend(
-        @MessageBody() data: string,
-        @ConnectedSocket() client: Socket,
-    ): string {
-        return data;
-    }
-
-    //加入一个群聊
-    @SubscribeMessage('joinGroupSocket')
-    joinGroup(
-        @MessageBody() data: string,
-        @ConnectedSocket() client: Socket,
-    ): string {
-        return data;
-    }
-
     @SubscribeMessage('joinRoom')
     joinRoom(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
         client.join(data);
