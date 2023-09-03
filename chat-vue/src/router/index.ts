@@ -2,7 +2,6 @@ import {createRouter, createWebHistory, Router, RouteRecordRaw} from "vue-router
 import {getUserInfo} from "../api/auth";
 import userInfoStoreHook from "../store/modules/userInfo";
 import {setToken} from "../utils/cookies";
-import {delay} from "../utils/time";
 
 const userInfoStore = userInfoStoreHook()
 
@@ -36,7 +35,6 @@ const router: Router = createRouter({
 const whiteList = ['login']
 
 router.beforeEach((to, _from, next) => {
-    delay(3000)
     if (whiteList.includes(to.name as string)) {
         next()
     } else {

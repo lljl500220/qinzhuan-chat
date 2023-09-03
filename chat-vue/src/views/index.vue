@@ -1,53 +1,71 @@
 <script setup lang="ts">
-import {Plus, Search} from "@element-plus/icons-vue";
+import { Plus, Search } from "@element-plus/icons-vue";
 import { onMounted, ref, watch } from "vue";
 import QinChatList from "../components/QinChatList.vue";
 import { useUserInfoStore } from "../store/modules/userInfo";
-import { findUserApi,addFriendApi } from "../api/friend";
+import { findUserApi, addFriendApi } from "../api/friend";
 import { ElMessage } from "element-plus";
 import { useChatStore } from "../store/modules/chat";
 import QinChatContent from "../components/QinChatContent.vue";
+import { debounceTime, fromEvent, Subject, map, from } from "rxjs";
 
-const searchGroupWord = ref('')
-const searchFriendWord = ref('')
+const searchGroupWord = ref("");
+const searchFriendWord = ref("");
 
-const userInfoStore = useUserInfoStore()
-const chatStore = useChatStore()
+const userInfoStore = useUserInfoStore();
+const chatStore = useChatStore();
 
-const showFindForm = ref(false)
+const showFindForm = ref(false);
 
-const friendList = ref<Friend[]>([])
-interface FindUserRes{
-  code:number
-  data:{
-    users:[]
+const friendList = ref<Friend[]>([]);
+
+interface FindUserRes {
+  code: number
+  data: {
+    users: []
   },
-  message:string
+  message: string
 }
-watch(() => searchFriendWord.value, (n:string) => {
-  if (n !== ''){
-    findUserApi({data:n}).then((res:FindUserRes)=>{
-      friendList.value = res.data.users
-    })
+
+watch(() => searchFriendWord.value, (n: string) => {
+  if (n !== "") {
+    findUserApi({ data: n }).then((res: FindUserRes) => {
+      friendList.value = res.data.users;
+    });
   }
 });
-const addFriend = (id:string,name:string) =>{
-  addFriendApi({userId:userInfoStore.user.userId,friendId:id}).then((res:FindUserRes)=>{
-    if (res.code === 0){
-      ElMessage.success('添加成功，去发起会话吧！')
+const addFriend = (id: string, name: string) => {
+  addFriendApi({ userId: userInfoStore.user.userId, friendId: id }).then((res: FindUserRes) => {
+    if (res.code === 0) {
+      ElMessage.success("添加成功，去发起会话吧！");
       chatStore.chatFriendList.unshift({
-        id:[userInfoStore.user.userId,id].sort().join('-'),
+        id: [userInfoStore.user.userId, id].sort().join("-"),
         friendId: id,
         friendName: name,
         messageList: []
-      })
-    }else {
-      ElMessage.warning(res.message)
+      });
+    } else {
+      ElMessage.warning(res.message);
     }
-  })
-}
+  });
+};
+
+// const sub = new Subject();
+// sub.pipe(debounceTime(1000),map((val)=>val+'this')).subscribe((a)=>{
+//   console.log(a);
+// })
+//
+//
+// fromEvent(window, "resize").subscribe(() => {
+//   sub.next("2222");
+// });
+
+from([1,2,3]).pipe(debounceTime(2000)).subscribe((a)=>{
+  console.log(a);
+})
+
 onMounted(() => {
-  chatStore.initSocket()
+  chatStore.initSocket();
 });
 </script>
 
@@ -55,27 +73,27 @@ onMounted(() => {
   <div class="chat">
     <div class="chat-my">
       <div class="chat-my-name">
-        {{userInfoStore.user.username[0]}}
+        {{ userInfoStore.user.username[0] }}
       </div>
     </div>
     <div class="chat-friend">
       <div class="chat-friend-search">
         <div class="chat-friend-search-input">
           <el-input
-              v-model="searchGroupWord"
-              class="w-50 m-2"
-              placeholder=""
-              :prefix-icon="Search as any"
+            v-model="searchGroupWord"
+            class="w-50 m-2"
+            placeholder=""
+            :prefix-icon="Search as any"
           />
         </div>
         <div class="chat-friend-search-add">
           <el-icon @click="showFindForm = true">
-            <Plus/>
+            <Plus />
           </el-icon>
         </div>
       </div>
       <div class="chat-friend-list">
-        <qin-chat-list/>
+        <qin-chat-list />
       </div>
     </div>
     <div class="chat-room">
@@ -87,8 +105,9 @@ onMounted(() => {
     <div class="search-friend-list">
       <ul>
         <li v-for="friend in friendList">
-          <span>{{friend.username}}</span>
-          <el-button type="primary" size="small" round plain @click="addFriend(friend.userId,friend.username)">加好友</el-button>
+          <span>{{ friend.username }}</span>
+          <el-button type="primary" size="small" round plain @click="addFriend(friend.userId,friend.username)">加好友
+          </el-button>
         </li>
       </ul>
     </div>
@@ -110,19 +129,20 @@ onMounted(() => {
     width: 60px;
     background: rgb(46, 46, 46);
     text-align: center;
-    &-name{
+
+    &-name {
       color: #fff;
       font-size: 44px;
-      text-shadow: #FFF 1px 0 10px,#FFF 1px 0 10px,#FFF 1px 0 10px;
+      text-shadow: #FFF 1px 0 10px, #FFF 1px 0 10px, #FFF 1px 0 10px;
     }
   }
 
   &-friend {
     height: 100%;
     width: 300px;
-    background: rgb(231,231,231);
+    background: rgb(231, 231, 231);
     box-sizing: border-box;
-    border-right: rgb(231,231,231) 1px solid;
+    border-right: rgb(231, 231, 231) 1px solid;
 
     &-search {
       width: 100%;
@@ -178,12 +198,15 @@ onMounted(() => {
     width: 540px;
   }
 }
-.search-friend-list{
+
+.search-friend-list {
   width: 100%;
-  ul{
+
+  ul {
     padding: 10px;
   }
-  li{
+
+  li {
     width: 100%;
     list-style-type: none;
     display: flex;
