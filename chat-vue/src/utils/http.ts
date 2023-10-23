@@ -1,12 +1,12 @@
 import { request } from './service'
 import { ElLoading } from 'element-plus'
 
-export const post = (
+export const post = async (
   url: string,
   data = {},
   isLoading = true
 ): Promise<any> => {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     let loading: any = null
     if (isLoading) {
       loading = ElLoading.service({
@@ -16,7 +16,7 @@ export const post = (
       })
     }
     request({
-      url: url,
+      url,
       method: 'post',
       data
     })
@@ -35,13 +35,13 @@ export const post = (
   })
 }
 
-export const get = (
+export const get = async (
   url: string,
-  data?: any,
+  data?: any
 ): Promise<any> => {
-  return new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     request({
-      url: url,
+      url,
       method: 'get',
       params: data
     })

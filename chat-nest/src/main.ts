@@ -9,7 +9,6 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets(join(__dirname, '..', 'public'));
-  // app.use(cors) //允许跨域
   app.enableCors(); //允许跨域
   app.use(logger); //全局中间件
   app.useGlobalInterceptors(new HttpResponseInterceptor()); //全局响应拦截器

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {computed, onMounted, PropType, ref, watch} from "vue";
 import {useChatStore} from "../store/modules/chat";
-import {Logger} from "sass";
 
 const chatStore = useChatStore()
 //色彩集合

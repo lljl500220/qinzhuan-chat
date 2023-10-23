@@ -37,6 +37,7 @@ const addFriend = (id:string,name:string) =>{
       ElMessage.success('添加成功，去发起会话吧！')
       chatStore.chatFriendList.unshift({
         id:[userInfoStore.user.userId,id].sort().join('-'),
+        room: '',
         friendId: id,
         friendName: name,
         messageList: []
@@ -86,7 +87,7 @@ onMounted(() => {
     <el-input v-model="searchFriendWord" clearable placeholder="id或用户名"></el-input>
     <div class="search-friend-list">
       <ul>
-        <li v-for="friend in friendList">
+        <li v-for="friend in friendList" :key="friend.userId">
           <span>{{friend.username}}</span>
           <el-button type="primary" size="small" round plain @click="addFriend(friend.userId,friend.username)">加好友</el-button>
         </li>

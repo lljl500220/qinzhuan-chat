@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import {useChatStore} from "../store/modules/chat";
 import {storeToRefs} from "pinia";
-import {ref} from "vue";
-import {useUserInfoStore} from "../store/modules/userInfo.ts";
-import axios from "axios";
-import {getToken} from "../utils/cookies.ts";
+import {onMounted, ref} from "vue";
+import {useUserInfoStore} from "../store/modules/userInfo";
+import {fromEvent, Observable} from "rxjs";
 
 const chatStore = useChatStore();
 const userInfoStore = useUserInfoStore()
@@ -18,22 +17,29 @@ const sendMsg = () => {
 
 const emojis = ['😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🫠', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '🥲',
   '🤗', '🫡', '🤐']
-const getEmoji = (emoji:string) => {
+const getEmoji = (emoji: string) => {
   sendMsgStr.value += emoji
 }
 
-const uploadImg = (event:InputEvent) => {
-  const file = event.target.files[0]
-  const formData = new FormData();
-  formData.append('file', file);
-  axios.post('http://localhost:3000/users/upload',formData,{
-    headers:{
-      Authorization: 'Bearer ' + getToken(),
-    }
-  }).then((res:any)=>{
-    console.log(res)
+// const uploadImg = (file:File) => {
+//   const formData = new FormData();
+//   formData.append('file', file);
+//   axios.post('http://localhost:3000/users/upload', formData, {
+//     headers: {
+//       Authorization: 'Bearer ' + getToken(),
+//     }
+//   }).then((res: any) => {
+//     console.log(res)
+//   })
+// }
+const chooseFileInput = ref<HTMLInputElement>()
+const inputObs = ref<Observable<any>>()
+onMounted(() => {
+  inputObs.value = fromEvent(chooseFileInput.value as HTMLInputElement, 'change')
+  inputObs.value.subscribe(() => {
+
   })
-}
+})
 </script>
 
 <template>
@@ -45,10 +51,10 @@ const uploadImg = (event:InputEvent) => {
     </div>
     <div class="chat-content-msg-list">
       <el-scrollbar>
-        <ul v-for="msg in activeRoomInfo.messageList">
+        <ul v-for="msg in activeRoomInfo.messageList" :key="msg.id">
           <li class="msg-item" v-if="msg.userId !== userInfoStore.user.userId">
             <div class="msg-avatar">
-              {{activeRoomInfo.friendName[0] || activeRoomInfo.groupName[0]}}
+              {{ activeRoomInfo.friendName[0] || activeRoomInfo.groupName[0] }}
             </div>
             <div class="msg-content">
               {{ msg.content }}
@@ -59,7 +65,7 @@ const uploadImg = (event:InputEvent) => {
               {{ msg.content }}
             </div>
             <div class="msg-avatar">
-              {{activeRoomInfo.friendName[0] || activeRoomInfo.groupName[0]}}
+              {{ activeRoomInfo.friendName[0] || activeRoomInfo.groupName[0] }}
             </div>
           </li>
         </ul>
@@ -71,10 +77,10 @@ const uploadImg = (event:InputEvent) => {
           <span>😀😇</span>
         </template>
         <div style="display: flex;flex-wrap: wrap;gap: 4px ">
-          <div style="font-family: sans-serif" @click="getEmoji(item)" v-for="item in emojis">{{ item }}</div>
+          <div style="font-family: sans-serif" @click="getEmoji(item)" v-for="item in emojis" :key="item">{{ item }}</div>
         </div>
       </el-popover>
-      <input type="file" @change="uploadImg"/>
+      <input type="file" ref="chooseFileInput"/>
       <el-input
           v-model="sendMsgStr"
           :rows="3"
@@ -105,18 +111,21 @@ const uploadImg = (event:InputEvent) => {
     box-sizing: border-box;
     height: calc(100% - 70px - 100px);
     overflow: hidden;
-    ul{
+
+    ul {
       padding: 0;
       margin: 0;;
     }
-    .msg-item{
+
+    .msg-item {
       font-family: sans-serif;
       list-style-type: none;
       display: flex;
       flex-direction: row;
-      gap:10px;
+      gap: 10px;
       margin-bottom: 20px;
-      .msg-avatar{
+
+      .msg-avatar {
         width: 40px;
         height: 40px;
         line-height: 40px;
@@ -124,7 +133,8 @@ const uploadImg = (event:InputEvent) => {
         background-color: antiquewhite;
         border-radius: 50%;
       }
-      .msg-content{
+
+      .msg-content {
         line-height: 36px;
         padding: 2px 15px;
         box-sizing: border-box;
@@ -132,12 +142,15 @@ const uploadImg = (event:InputEvent) => {
         border-radius: 10px;
       }
     }
-    .right{
+
+    .right {
       justify-content: flex-end;
-      .msg-avatar{
+
+      .msg-avatar {
         background-color: rgb(51, 161, 236);
       }
-      .msg-content{
+
+      .msg-content {
         background-color: rgb(51, 161, 236);
       }
     }
